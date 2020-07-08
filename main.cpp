@@ -23,10 +23,11 @@ int main()
   Term y = s->make_symbol("y", intsort);
   Term z = s->make_symbol("z", intsort);
 
-  s->assert_formula(s->make_term(Equal, z, s->make_term(Plus, x, y)));
+  Term w = s->make_term(Equal, z, s->make_term(Plus, x, y));
+  s->assert_formula(w);
 
-  TCCGenerator tccg;
-  Term t_f = tccg->convert(s);
+  TCCGenerator tccg(s, 1);
+  Term t_f = tccg.convert(w);
   //Term tcc = tccg.generate_tcc(t_f);
 
   Result r = s->check_sat();
