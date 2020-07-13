@@ -31,13 +31,14 @@ int main()
   Term w = s->make_term(Equal, z, s->make_term(Plus, x, y));
   s->assert_formula(w);
 
-  Term w2 = s->make_term(Equal, s->make_term(Plus, a, b), s->make_term(Plus, d, a));
+  Term w2 = s->make_term(Equal, s->make_term(Div, a, b), s->make_term(Plus, d, a));
   s->assert_formula(w2);
 
   TCCGenerator tccg(s, 1);
-  Term t_f = tccg.convert(w);
+  Term t_k = tccg.convert(w);
   Term t_j = tccg.convert(w2);
-  //Term tcc = tccg.generate_tcc(t_f);
+  Term tcc1 = tccg.generate_tcc(t_k);
+  Term tcc2 = tccg.generate_tcc(t_j);
 
   Result r = s->check_sat();
   assert(r.is_sat());
