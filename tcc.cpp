@@ -19,29 +19,41 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
     if (!op.is_null()) {
 
       TermVec cached_children;
+      TermVec cached_tcc;
 
       for (auto c : t) {
-        cached_children.push_back(cache_.at(c));
-//        cout << "c = " << c << endl;
-//        cout << "cache2.at = " << cache_.at(c) <<endl;
+        cached_children.push_back(c);
+        cached_tcc.push_back(cache_.at(c));
+        cout << "cache at " << c << " = " << cache_.at(c) <<endl;
+        cout << "cache at tcc push back" << c << " = " << cached_tcc[0] <<endl;
+//cahnge        cached_children.push_back(cache_.at(c));
       }
 
-      cache_[t] = solver_->make_term(op, cached_children);
-      cout << "op not null: " << cache_[t] <<endl;
-
-//      if (op.prim_op == Plus) {
-//        counter++;
-//      }
-
-//      if (op.prim_op == Div) {
-        //building up TCC with terms that have division by 0
-        //Term condition = solver_->make_term(Distinct, cached_children[1], int_zero_);
-//        //cache_[t] = condition;
-//      }
+      if (op.prim_op == Div) {
+        cout << "cached_children[1] = " << cached_children[1] << endl;
+        Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
+        cache_[t] = condition; //change
+        cout << "pushed back condition: " << condition << endl;
+      }
+      else {
+        Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1]);
+//        for (auto c : cached_children) {
+//          cout <<"c= "<< c <<endl;
+//          Term condition = solver_->make_term(And, condition, c);
+//        }
+//        will need loop for non binary ops
+        cache_[t] = condition; //change
+        cout << "cache_[" << t << "]= " << cache_[t] <<endl;
+        cout << "cached_tcc[0]= " <<cached_tcc[0]<<" ; " << "cached_tcc[1]= " << cached_tcc[1] << endl;
+//change        cache_[t] = solver_->make_term(op, cached_children);
+//        cout << "op not null: " << cache_[t] <<endl;
+      }
     }
     else {
-      cache_[t] = t;
-      cout << "op is null: " << cache_[t] <<endl;
+        cache_[t] = solver_->make_term(true); //change
+        cout << "cache_[" << t << "]= " << cache_[t]<<endl;
+//change      cache_[t] = t;
+//      cout << "op is null: " << cache_[t] <<endl;
     }
   }
   return Walker_Continue;
@@ -51,6 +63,7 @@ smt::Term TCCGenerator::convert(smt::Term &t)
 {
   visit(t);
   Term res = cache_.at(t);
+  cout << "res = " << res << endl;
   return res;
 }
 

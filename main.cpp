@@ -32,6 +32,7 @@ int main()
   s->assert_formula(w);
 
   Term w2 = s->make_term(Equal, s->make_term(Div, a, b), s->make_term(Plus, d, a));
+  //Term w2 = s->make_term(Equal, s->make_term(Div, a, s->make_term(0, intsort)), s->make_term(Plus, d, a));
   s->assert_formula(w2);
 
   TCCGenerator tccg(s, 1);
