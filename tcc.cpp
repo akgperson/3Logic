@@ -22,6 +22,8 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
 
       for (auto c : t) {
         cached_children.push_back(cache_.at(c));
+//        cout << "c = " << c << endl;
+//        cout << "cache2.at = " << cache_.at(c) <<endl;
       }
 
       cache_[t] = solver_->make_term(op, cached_children);

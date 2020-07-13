@@ -15,7 +15,7 @@ class TCCGenerator : smt::IdentityWalker
     using TermVec = std::vector<smt::Term>;
     smt::Term int_zero_;
 
-//    using UnorderedTermMap = std::unordered_map<smt::Term, smt::Term>;
-//    smt::UnorderedTermMap cache2;
+    using UnorderedTermMap = std::unordered_map<smt::Term, smt::Term>;
+    smt::UnorderedTermMap cache2;
 };
 
