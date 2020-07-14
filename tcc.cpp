@@ -24,16 +24,12 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
       for (auto c : t) {
         cached_children.push_back(c);
         cached_tcc.push_back(cache_.at(c));
-        cout << "cache at " << c << " = " << cache_.at(c) <<endl;
-        cout << "cache at tcc push back" << c << " = " << cached_tcc[0] <<endl;
 //cahnge        cached_children.push_back(cache_.at(c));
       }
 
       if (op.prim_op == Div) {
-        cout << "cached_children[1] = " << cached_children[1] << endl;
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
         cache_[t] = condition; //change
-        cout << "pushed back condition: " << condition << endl;
       }
       else {
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1]);
@@ -43,15 +39,12 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
 //        }
 //        will need loop for non binary ops
         cache_[t] = condition; //change
-        cout << "cache_[" << t << "]= " << cache_[t] <<endl;
-        cout << "cached_tcc[0]= " <<cached_tcc[0]<<" ; " << "cached_tcc[1]= " << cached_tcc[1] << endl;
 //change        cache_[t] = solver_->make_term(op, cached_children);
 //        cout << "op not null: " << cache_[t] <<endl;
       }
     }
     else {
         cache_[t] = solver_->make_term(true); //change
-        cout << "cache_[" << t << "]= " << cache_[t]<<endl;
 //change      cache_[t] = t;
 //      cout << "op is null: " << cache_[t] <<endl;
     }

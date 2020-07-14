@@ -29,20 +29,31 @@ int main()
   Term d = s->make_symbol("d", intsort);
 
   Term w = s->make_term(Equal, z, s->make_term(Plus, x, y));
-  s->assert_formula(w);
+//  s->assert_formula(w);
 
   Term w2 = s->make_term(Equal, s->make_term(Div, a, b), s->make_term(Plus, d, a));
   //Term w2 = s->make_term(Equal, s->make_term(Div, a, s->make_term(0, intsort)), s->make_term(Plus, d, a));
-  s->assert_formula(w2);
+//  s->assert_formula(w2);
 
   TCCGenerator tccg(s, 1);
-  Term t_k = tccg.convert(w);
-  Term t_j = tccg.convert(w2);
-  Term tcc1 = tccg.generate_tcc(t_k);
-  Term tcc2 = tccg.generate_tcc(t_j);
+  Term tcc1 = tccg.convert(w);
+  Term tcc2 = tccg.convert(w2);
+//  Term tcc1 = tccg.generate_tcc(t_k);
+//  Term tcc2 = tccg.generate_tcc(t_j);
+  s->assert_formula(tcc1);
+  s->assert_formula(tcc2);
 
+  //checks satisfiability of tcc
+  //TODO: make this checking tcc step one tcc at a time, reseting solver between calls
   Result r = s->check_sat();
   assert(r.is_sat());
+  //TODO output satisfiability of tcc and maybe tcc itself here
+
+  s->reset_assertions();
+  s->assert_formula(w);
+  s->assert_formula(w2);
+  Result res = s->check_sat();
+  assert(res.is_sat());
 
   cout << "Model Values:" << endl;
   for (auto t : TermVec({ x, y, z }))
