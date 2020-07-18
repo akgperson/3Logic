@@ -26,21 +26,18 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
         cached_tcc.push_back(cache_.at(c));
       }
 
-      //TODO: add operator And, Iff, Not
       if (op.prim_op == Or) {
         Term condition = solver_->make_term(Or, solver_->make_term(And, cached_tcc[0], cached_children[0]), solver_->make_term(And, cached_tcc[1], cached_children[1]), solver_->make_term(And, cached_tcc[0], cached_tcc[1]));
         cache_[t] = condition;
       }
-//      else if (op.prim_op == Ite) {
-//        if (cached_children[1] == true) { //check, this should be for the case where second argument is type t
-//          Term condition = solver_->make_term(And, cached_tcc[0], solver_->make_term(Ite, cached_children[0], cached_tcc[1], cached_tcc[2]));
-//          cache_[t] = condition;
-//        }
-//        else { //check, should be for case where second argument is type of phi
-//          Term condition = solver_->make_term(And, cached_tcc[0], solver_->make_term(Ite, cached_children[0], cached_tcc[1], cached_tcc[2]));
-//          cache_[t] = condition;
-//        }
-//      }
+      else if (op.prim_op == And) {
+        Term condition = solver_->make_term(Or, solver_->make_term(And, cached_tcc[0], solver_->make_term(Not, cached_children[0])), solver_->make_term(And, cached_tcc[1], solver_->make_term(Not, cached_children[1])), solver_->make_term(And, cached_tcc[0], cached_tcc[1]));
+        cache_[t] = condition;
+      }
+      else if (op.prim_op == Ite) {
+        Term condition = solver_->make_term(And, cached_tcc[0], solver_->make_term(Ite, cached_children[0], cached_tcc[1], cached_tcc[2]));
+        cache_[t] = condition;
+      }
       else if (op.prim_op == Implies) {
         Term condition = solver_->make_term(Or, solver_->make_term(And, cached_tcc[0], solver_->make_term(Not, cached_children[0])), solver_->make_term(And, cached_tcc[1], cached_children[1]), solver_->make_term(And, cached_tcc[0], cached_tcc[1]));
         cache_[t] = condition;
@@ -49,11 +46,14 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
         Term condition = solver_->make_term(Not, cached_tcc[0]);
         cache_[t] = condition;
       }
-//      else if (ep.prim_op == Iff) {
-//        Term subcondition = d;
-//        Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], subcondition);
-//        cache_[t] = condition;
-//      }
+      else if (op.prim_op == Iff) {
+        Term subcondition1 = solver_->make_term(And, cached_children[0], cached_children[1]);
+        Term subcondition2 = solver_->make_term(And, solver_->make_term(Not, cached_children[0]), solver_->make_term(Not, cached_children[1]));
+        Term subcondition3 = solver_->make_term(Or, solver_->make_term(And, cached_tcc[0], solver_->make_term(Not, cached_children[0])), solver_->make_term(And, cached_tcc[1], solver_->make_term(Not, cached_children[1])), solver_->make_term(And, cached_tcc[0], cached_tcc[1]));
+        Term subcondition4 = solver_->make_term(Or, solver_->make_term(And, cached_tcc[0], cached_children[0]), solver_->make_term(And, cached_tcc[1], cached_children[1]), solver_->make_term(And, cached_tcc[0], cached_tcc[1]));
+        Term condition = solver_->make_term(Or, solver_->make_term(And, subcondition1, subcondition3), solver_->make_term(And, subcondition4, subcondition2), solver_->make_term(And, subcondition3, subcondition4));
+        cache_[t] = condition;
+      }
 
       else if (op.prim_op == Div) {
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
