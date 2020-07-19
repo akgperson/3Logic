@@ -55,7 +55,20 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
         cache_[t] = condition;
       }
 
+      else if (op.prim_op == Mod) { //could merge w Div
+        Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
+        cache_[t] = condition;
+      }
+//      else if (op.prim_op == Pow) {
+//        //if x^p, where p=m/d, domain non-neg real numbers if d is even, otherwise domain all reals
+        //could alter this by adding if statemetns to get simpler condition that only add when applies
+//        condition = solver_->make_term(Implies, solver_->make_term(And, p is rational div num, d even), x nonnegative);
+//        cache_[t] = solver_->make_term(And, cached_tcc[0], cached_tcc[1], condition);
       else if (op.prim_op == Div) {
+        Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
+        cache_[t] = condition; //change
+      }
+      else if (op.prim_op == IntDiv) { //could merge w Div
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
         cache_[t] = condition; //change
       }
