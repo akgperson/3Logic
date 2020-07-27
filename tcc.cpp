@@ -59,11 +59,6 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
         cache_[t] = condition;
       }
-//      else if (op.prim_op == Pow) {
-//        //if x^p, where p=m/d, domain non-neg real numbers if d is even, otherwise domain all reals
-        //could alter this by adding if statemetns to get simpler condition that only add when applies
-//        condition = solver_->make_term(Implies, solver_->make_term(And, p is rational div num, d even), x nonnegative);
-//        cache_[t] = solver_->make_term(And, cached_tcc[0], cached_tcc[1], condition);
       else if (op.prim_op == Div) {
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
         cache_[t] = condition; //change
@@ -72,13 +67,24 @@ smt::WalkerStepResult TCCGenerator::visit_term(smt::Term &t)
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1], solver_->make_term(Distinct, cached_children[1], int_zero_));
         cache_[t] = condition; //change
       }
-      else {
+
+      //Quantifiers
+      //TODO add exists; fix issue where get 'undeclared identifier: Exists' error
+      //else if (op.prim_op == Exists) {
+        //Term condition = solver_->make_term(Or, solver_->make_term(Exists, cached_children[0], solver_->make_term(And, cached_children[1], cached_tcc[1]), solver_->make_term(Forall, cached_children[0], cached_tcc[1])));
+        //cache_[t] = condition;
+      //}
+      //TODO add Forall
+      //else if (op.prim_op == Exists) {
+      //}
+
+      else { //op w/o undefined behavior
         Term condition = solver_->make_term(And, cached_tcc[0], cached_tcc[1]);
-//        will need loop for non binary ops
+//        will need loop for non binary ops?
         cache_[t] = condition;
       }
     }
-    else {
+    else { //at leaf
         cache_[t] = solver_->make_term(true); //change
     }
   }
